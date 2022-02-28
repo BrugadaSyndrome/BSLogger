@@ -14,11 +14,11 @@ type Logger struct {
 	Logger *log.Logger
 }
 
-func NewLogger(flags int, name string, verbosity verbosity, logFile *os.File) Logger {
+func NewLogger(name string, verbosity verbosity, logFile *os.File) Logger {
 	logger := Logger{
 		name:      fmt.Sprintf("[%s] ", name),
 		verbosity: verbosity,
-		Logger:    log.New(os.Stdout, "", flags),
+		Logger:    log.New(os.Stdout, "", log.Ldate|log.Ltime|log.Lmsgprefix),
 
 		logFile: logFile,
 	}
