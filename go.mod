@@ -1,3 +1,3 @@
 module github.com/BrugadaSyndrome/bslogger
 
-go 1.17
+go 1.19
