@@ -9,29 +9,27 @@ import (
 type Logger struct {
 	logFile   *os.File
 	logger    *log.Logger
-	name      string
-	verbosity verbosity
+	Name      string
+	Verbosity Verbosity
 }
 
-func NewLogger(name string, verbosity verbosity, logFile *os.File) Logger {
-	logger := Logger{
-		logFile:   logFile,
+func NewLogger() Logger {
+	return Logger{
 		logger:    log.New(os.Stdout, "", log.Ldate|log.Ltime|log.Lmsgprefix),
-		name:      fmt.Sprintf("[%s] ", name),
-		verbosity: verbosity,
+		Name:      "BSLogger",
+		Verbosity: Normal,
 	}
-	return logger
 }
 
 func (l *Logger) Fatal(message string) {
 	if l.logFile != nil {
 		l.logger.SetOutput(l.logFile)
-		l.logger.SetPrefix(fmt.Sprintf("%sFATAL: %s", l.name, message))
+		l.logger.SetPrefix(fmt.Sprintf("%s FATAL: %s", l.Name, message))
 		l.logger.Print(message)
 	}
 
 	l.logger.SetOutput(os.Stderr)
-	l.logger.SetPrefix(l.name + ansiEscapeEncode("FATAL: ", fgBrightRed, bgDefault, framed))
+	l.logger.SetPrefix(l.Name + ansiEscapeEncode(" FATAL: ", fgBrightRed, bgDefault, framed))
 	l.logger.Fatalf(ansiEscapeEncode(message, fgBrightRed, bgDefault, framed))
 }
 
@@ -40,18 +38,18 @@ func (l *Logger) Fatalf(format string, values ...interface{}) {
 }
 
 func (l *Logger) Error(message string) {
-	if l.verbosity < Minimal {
+	if l.Verbosity < Minimal {
 		return
 	}
 
 	if l.logFile != nil {
 		l.logger.SetOutput(l.logFile)
-		l.logger.SetPrefix(fmt.Sprintf("%sERROR: ", l.name))
+		l.logger.SetPrefix(fmt.Sprintf("%s ERROR: ", l.Name))
 		l.logger.Print(message)
 	}
 
 	l.logger.SetOutput(os.Stderr)
-	l.logger.SetPrefix(l.name + ansiEscapeEncode("ERROR: ", fgRed, bgDefault, normal))
+	l.logger.SetPrefix(l.Name + ansiEscapeEncode(" ERROR: ", fgRed, bgDefault, normal))
 	l.logger.Print(ansiEscapeEncode(message, fgRed, bgDefault, normal))
 }
 
@@ -60,18 +58,18 @@ func (l *Logger) Errorf(format string, values ...interface{}) {
 }
 
 func (l *Logger) Warning(message string) {
-	if l.verbosity < Normal {
+	if l.Verbosity < Normal {
 		return
 	}
 
 	if l.logFile != nil {
 		l.logger.SetOutput(l.logFile)
-		l.logger.SetPrefix(fmt.Sprintf("%sWARNING: ", l.name))
+		l.logger.SetPrefix(fmt.Sprintf("%s WARNING: ", l.Name))
 		l.logger.Print(message)
 	}
 
 	l.logger.SetOutput(os.Stdout)
-	l.logger.SetPrefix(l.name + ansiEscapeEncode("WARNING: ", fgYellow, bgDefault, normal))
+	l.logger.SetPrefix(l.Name + ansiEscapeEncode(" WARNING: ", fgYellow, bgDefault, normal))
 	l.logger.Print(ansiEscapeEncode(message, fgYellow, bgDefault, normal))
 }
 
@@ -80,18 +78,18 @@ func (l *Logger) Warningf(format string, values ...interface{}) {
 }
 
 func (l *Logger) Info(message string) {
-	if l.verbosity < Normal {
+	if l.Verbosity < Normal {
 		return
 	}
 
 	if l.logFile != nil {
 		l.logger.SetOutput(l.logFile)
-		l.logger.SetPrefix(fmt.Sprintf("%sINFO: ", l.name))
+		l.logger.SetPrefix(fmt.Sprintf("%s INFO: ", l.Name))
 		l.logger.Print(message)
 	}
 
 	l.logger.SetOutput(os.Stdout)
-	l.logger.SetPrefix(l.name + ansiEscapeEncode("INFO: ", fgBlue, bgDefault, normal))
+	l.logger.SetPrefix(l.Name + ansiEscapeEncode(" INFO: ", fgBlue, bgDefault, normal))
 	l.logger.Print(ansiEscapeEncode(message, fgBlue, bgDefault, normal))
 }
 
@@ -100,21 +98,30 @@ func (l *Logger) Infof(format string, values ...interface{}) {
 }
 
 func (l *Logger) Debug(message string) {
-	if l.verbosity < All {
+	if l.Verbosity < All {
 		return
 	}
 
 	if l.logFile != nil {
 		l.logger.SetOutput(l.logFile)
-		l.logger.SetPrefix(fmt.Sprintf("%sDEBUG: ", l.name))
+		l.logger.SetPrefix(fmt.Sprintf("%s DEBUG: ", l.Name))
 		l.logger.Print(message)
 	}
 
 	l.logger.SetOutput(os.Stdout)
-	l.logger.SetPrefix(l.name + ansiEscapeEncode("DEBUG: ", fgPurple, bgDefault, normal))
+	l.logger.SetPrefix(l.Name + ansiEscapeEncode(" DEBUG: ", fgPurple, bgDefault, normal))
 	l.logger.Print(ansiEscapeEncode(message, fgPurple, bgDefault, normal))
 }
 
 func (l *Logger) Debugf(format string, values ...interface{}) {
 	l.Debug(fmt.Sprintf(format, values...))
+}
+
+func (l *Logger) SetLogFile(filepath string) error {
+	logFile, err := os.Create(filepath)
+	if err != nil {
+		return err
+	}
+	l.logFile = logFile
+	return nil
 }

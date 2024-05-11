@@ -1,6 +1,8 @@
 package bslogger
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type ansiEscapeCode int
 
@@ -66,11 +68,5 @@ const (
 )
 
 func ansiEscapeEncode(message string, fg ansiEscapeCode, bg ansiEscapeCode, display ansiEscapeCode) string {
-	// Ansi escape codes do not work in Windows terminal
-	/*
-		if runtime.GOOS == "windows" {
-			return message
-		}
-	*/
 	return fmt.Sprintf("\033[%d;%d;%dm%s\033[0m", fg, bg, display, message)
 }

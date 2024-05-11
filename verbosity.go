@@ -1,14 +1,14 @@
 package bslogger
 
-type verbosity int
+type Verbosity int
 
 const (
-	Minimal verbosity = iota
+	Minimal Verbosity = iota
 	Normal
 	All
 )
 
-func (v verbosity) String() string {
+func (v Verbosity) String() string {
 	return []string{
 		"Minimal", "Normal", "All",
 	}[v]
